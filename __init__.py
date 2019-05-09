@@ -5,12 +5,15 @@ from pythonforandroid.toolchain import (
     current_directory,
     shprint,
 )
+from pythonforandroid.logger import info
 from multiprocessing import cpu_count
 
 
 class GRPCRecipe(NDKRecipe):
     version = 'v1.20.1'
-    url = 'https://github.com/grpc/grpc/archive/{version}.zip'
+    #url = 'https://github.com/grpc/grpc/archive/{version}.zip'
+    url = None
+    port_git = 'https://github.com/grpc/grpc.git'
     generated_libraries = [
         'libaddress_sorting.a',
         'libbenchmark.a',
@@ -46,8 +49,16 @@ class GRPCRecipe(NDKRecipe):
         env['ANDROID_SDK'] = self.ctx.sdk_dir
         return env
 
+    def prebuild_arch(self, arch):
+        build_dir = self.get_build_dir(arch.arch)
+        source_dir = join(build_dir, 'grpc')
+        info("clone GRPC sources from {}".format(self.port_git))
+        shprint(sh.git, 'clone', '--recursive', self.port_git, source_dir, _tail=20, _critical=True)
+
     def build_arch(self, arch):
-        build_dir = join(self.get_build_dir(arch.arch), 'build')
+        build_dir = self.get_build_dir(arch.arch)
+        source_dir = join(build_dir, 'grpc')
+        build_dir = join(source_dir, 'build')
         shprint(sh.mkdir, '-p', build_dir)
         with current_directory(build_dir):
             env = self.get_recipe_env(arch)
@@ -107,7 +118,7 @@ class GRPCRecipe(NDKRecipe):
                     '-DgRPC_GFLAGS_PROVIDER=package',
                     '-DgRPC_BUILD_CODEGEN=OFF',
 
-                    self.get_build_dir(arch.arch),
+                    source_dir,
                     _env=env)
             shprint(sh.make, '-j' + str(cpu_count()))
             # Copy third party shared libs that we need in our final apk
