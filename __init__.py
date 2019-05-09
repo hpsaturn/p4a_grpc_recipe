@@ -1,4 +1,4 @@
-from os.path import join
+from os.path import join, isdir, isfile
 import sh
 from pythonforandroid.recipe import NDKRecipe
 from pythonforandroid.toolchain import (
@@ -52,13 +52,15 @@ class GRPCRecipe(NDKRecipe):
     def prebuild_arch(self, arch):
         build_dir = self.get_build_dir(arch.arch)
         source_dir = join(build_dir, 'grpc')
-        info("clone GRPC sources from {}".format(self.port_git))
-        shprint(sh.git, 'clone', '--recursive', self.port_git, source_dir, _tail=20, _critical=True)
+        if not isfile(join(source_dir, 'setup.py')):
+            info("clone GRPC sources from {}".format(self.port_git))
+            shprint(sh.git, 'clone', '--recursive', self.port_git, source_dir, _tail=20, _critical=True)
 
     def build_arch(self, arch):
         build_dir = self.get_build_dir(arch.arch)
         source_dir = join(build_dir, 'grpc')
         build_dir = join(source_dir, 'build')
+        shprint(sh.rm, '-rf', build_dir)
         shprint(sh.mkdir, '-p', build_dir)
         with current_directory(build_dir):
             env = self.get_recipe_env(arch)
@@ -111,11 +113,6 @@ class GRPCRecipe(NDKRecipe):
                     '-DHAVE_STEADY_CLOCK=ON',
                     '-DgRPC_INSTALL=ON',
                     '-DgRPC_BUILD_TESTS=OFF',
-                    '-DgRPC_PROTOBUF_PROVIDER=package',
-                    '-DgRPC_ZLIB_PROVIDER=package',
-                    '-DgRPC_CARES_PROVIDER=package',
-                    '-DgRPC_SSL_PROVIDER=package',
-                    '-DgRPC_GFLAGS_PROVIDER=package',
                     '-DgRPC_BUILD_CODEGEN=OFF',
 
                     source_dir,
