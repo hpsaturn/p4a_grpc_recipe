@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Vim backups
+*.swp
+*.swo
+
+# travis
+.travis.yml
+

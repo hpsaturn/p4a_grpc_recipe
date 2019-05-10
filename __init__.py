@@ -113,12 +113,12 @@ class GRPCRecipe(NDKRecipe):
                     '-DHAVE_STEADY_CLOCK=ON',
                     '-DgRPC_INSTALL=ON',
                     '-DgRPC_BUILD_TESTS=OFF',
-                    '-DgRPC_BUILD_CODEGEN=OFF',
-#                    '-DgRPC_PROTOBUF_PROVIDER=package',
+                    '-DgRPC_PROTOBUF_PROVIDER=package',
                     '-DgRPC_ZLIB_PROVIDER=package',
-#                    '-DgRPC_CARES_PROVIDER=package',
-#                    '-DgRPC_SSL_PROVIDER=package',
-#                    '-DgRPC_GFLAGS_PROVIDER=package',
+                    '-DgRPC_CARES_PROVIDER=package',
+                    '-DgRPC_SSL_PROVIDER=package',
+                    '-DgRPC_GFLAGS_PROVIDER=package',
+                    '-DgRPC_BUILD_CODEGEN=OFF',
 
                     source_dir,
                     _env=env)
