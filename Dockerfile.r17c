@@ -57,7 +57,7 @@ RUN curl https://raw.githubusercontent.com/kadwanev/retry/1.0.1/retry \
     --output /usr/local/bin/retry && chmod +x /usr/local/bin/retry
 
 ENV ANDROID_NDK_HOME="${ANDROID_HOME}/android-ndk"
-ENV ANDROID_NDK_VERSION="15c"
+ENV ANDROID_NDK_VERSION="17c"
 ENV ANDROID_NDK_HOME_V="${ANDROID_NDK_HOME}-r${ANDROID_NDK_VERSION}"
 
 # get the latest version from https://developer.android.com/ndk/downloads/index.html
@@ -251,6 +251,18 @@ RUN mkdir -p "${BUILD_DIR}" && cd "${BUILD_DIR}" \
   && rm -rf "${BUILD_DIR}" \
   # Wipe out to prevent influencing the grpc build
   && rm -rf ${PROJECT_DIR}/grpc/third_party/cares
+
+# Android OpenSSL
+ENV OPENSSL_ROOT ${PROJECT_DIR}/openssl
+RUN mkdir -p ${OPENSSL_ROOT} \
+  && curl -Lo /tmp/openssl.tar.gz \
+      https://github.com/openssl/openssl/archive/OpenSSL_1_0_2r.tar.gz \
+  && tar -xzvf /tmp/openssl.tar.gz -C ${OPENSSL_ROOT} --strip-components 1 \
+  && cd ${OPENSSL_ROOT} \
+  && CC=${TOOLCHAIN_DIR}/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc ./Configure --prefix=${INSTALL_DIR} android-armv7 \
+  && ANDROID_DEV=${ANDROID_NDK_HOME}/platforms/android-${ANDROID_NATIVE_API_LEVEL}/arch-arm/usr make install 
+
+RUN rm -rf ${PROJECT_DIR}/grpc/third_party/boringssl
 
 # Python and user packages
 
