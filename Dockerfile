@@ -301,3 +301,11 @@ USER ${USER}
 RUN virtualenv --python=python3 venv \
     && . venv/bin/activate \
     && pip3 install -e .
+
+RUN mkdir -p ${OPENSSL_ROOT} \
+  && curl -Lo /tmp/openssl.tar.gz \
+      https://github.com/openssl/openssl/archive/OpenSSL_1_1_1b.tar.gz \
+  && tar -xzvf /tmp/openssl.tar.gz -C ${OPENSSL_ROOT} --strip-components 1 \
+  && cd ${OPENSSL_ROOT} \
+  && PATH="${TOOLCHAIN_DIR}/prebuilt/linux-x86_64/bin/:${PATH}" ./Configure android-arm -D__ANDROID_API__=21 \
+  && PATH="${TOOLCHAIN_DIR}/prebuilt/linux-x86_64/bin/:${PATH}" make install
