@@ -302,6 +302,7 @@ RUN virtualenv --python=python3 venv \
     && . venv/bin/activate \
     && pip3 install -e .
 
+ENV OPENSSL_ROOT ${PROJECT_DIR}/openssl
 RUN mkdir -p ${OPENSSL_ROOT} \
   && curl -Lo /tmp/openssl.tar.gz \
       https://github.com/openssl/openssl/archive/OpenSSL_1_1_1b.tar.gz \
