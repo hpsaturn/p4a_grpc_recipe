@@ -57,7 +57,7 @@ RUN curl https://raw.githubusercontent.com/kadwanev/retry/1.0.1/retry \
     --output /usr/local/bin/retry && chmod +x /usr/local/bin/retry
 
 ENV ANDROID_NDK_HOME="${ANDROID_HOME}/android-ndk"
-ENV ANDROID_NDK_VERSION="15c"
+ENV ANDROID_NDK_VERSION="17c"
 ENV ANDROID_NDK_HOME_V="${ANDROID_NDK_HOME}-r${ANDROID_NDK_VERSION}"
 
 # get the latest version from https://developer.android.com/ndk/downloads/index.html
@@ -252,6 +252,36 @@ RUN mkdir -p "${BUILD_DIR}" && cd "${BUILD_DIR}" \
   # Wipe out to prevent influencing the grpc build
   && rm -rf ${PROJECT_DIR}/grpc/third_party/cares
 
+ENV OPENSSL_ROOT ${PROJECT_DIR}/openssl
+RUN mkdir -p ${OPENSSL_ROOT} \
+  && curl -Lo /tmp/openssl.tar.gz \
+      https://github.com/openssl/openssl/archive/OpenSSL_1_1_1b.tar.gz \
+  && tar -xzvf /tmp/openssl.tar.gz -C ${OPENSSL_ROOT} --strip-components 1 \
+  && cd ${OPENSSL_ROOT} \
+  && PATH="${TOOLCHAIN_DIR}/prebuilt/linux-x86_64/bin/:${PATH}" ./Configure android-arm -D__ANDROID_API__=21 \
+  && PATH="${TOOLCHAIN_DIR}/prebuilt/linux-x86_64/bin/:${PATH}" make install
+
+# Android Protobuf
+ENV BUILD_DIR /opt/build/protobuf
+RUN mkdir -p "${BUILD_DIR}" && cd "${BUILD_DIR}" \
+  && cmake -DCMAKE_TOOLCHAIN_FILE="${CMAKE_TOOLCHAIN_FILE}" \
+      -DANDROID_NDK="${NDK_ROOT}" \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DANDROID_ABI="${ANDROID_ABI}" \
+      -DANDROID_NATIVE_API_LEVEL=21 \
+      -DCMAKE_CXX_STANDARD=11 \
+      -DANDROID_STL=c++_static \
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+      -DCMAKE_FIND_ROOT_PATH="${INSTALL_DIR}" \
+      -Dprotobuf_BUILD_TESTS=OFF \
+      -DCMAKE_EXE_LINKER_FLAGS="-llog" \
+      #-Dprotobuf_BUILD_PROTOC_BINARIES=OFF \
+      ${PROJECT_DIR}/grpc/third_party/protobuf/cmake \
+  && cmake --build . --target install/strip -- -j"${N_JOBS}" \
+  && rm -rf "${BUILD_DIR}" \
+  # Wipe out to prevent influencing the grpc build
+  && rm -rf ${PROJECT_DIR}/grpc/third_party/protobuf
+
 # Python and user packages
 
 ENV USER="user"
@@ -302,11 +332,3 @@ RUN virtualenv --python=python3 venv \
     && . venv/bin/activate \
     && pip3 install -e .
 
-ENV OPENSSL_ROOT ${PROJECT_DIR}/openssl
-RUN mkdir -p ${OPENSSL_ROOT} \
-  && curl -Lo /tmp/openssl.tar.gz \
-      https://github.com/openssl/openssl/archive/OpenSSL_1_1_1b.tar.gz \
-  && tar -xzvf /tmp/openssl.tar.gz -C ${OPENSSL_ROOT} --strip-components 1 \
-  && cd ${OPENSSL_ROOT} \
-  && PATH="${TOOLCHAIN_DIR}/prebuilt/linux-x86_64/bin/:${PATH}" ./Configure android-arm -D__ANDROID_API__=21 \
-  && PATH="${TOOLCHAIN_DIR}/prebuilt/linux-x86_64/bin/:${PATH}" make install
