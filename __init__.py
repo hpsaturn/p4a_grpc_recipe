@@ -104,6 +104,8 @@ class GRPCRecipe(NDKRecipe):
                     '-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH',
                     '-DCMAKE_EXE_LINKER_FLAGS="-llog"',
                     '-DProtobuf_PROTOC_EXECUTABLE=/usr/local/bin/protoc',
+                    '-DProtobuf_LIBRARIES=/opt/install/lib',
+                    '-DProtobuf_INCLUDE_DIR=/opt/install/include/google/protobuf',
                     '-DHAVE_THREAD_SAFETY_ATTRIBUTES=ON',
                     '-DHAVE_GNU_POSIX_REGEX=ON',
                     '-DHAVE_STD_REGEX=ON',
