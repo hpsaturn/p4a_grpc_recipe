@@ -83,19 +83,10 @@ class GRPCRecipe(NDKRecipe):
                     '-DANDROID_STANDALONE_TOOLCHAIN={}'.format(self.ctx.ndk_dir),
                     '-DANDROID_NATIVE_API_LEVEL={}'.format(self.ctx.ndk_api),
                     '-DANDROID_EXECUTABLE={}/tools/android'.format(env['ANDROID_SDK']),
-
                     '-DCMAKE_TOOLCHAIN_FILE={}'.format(
                         join(self.ctx.ndk_dir, 'build', 'cmake',
                              'android.toolchain.cmake')),
-                    # Make the linkage with our python library, otherwise we
-                    # will get dlopen error when trying to import cv2's module.
-                    '-DCMAKE_SHARED_LINKER_FLAGS=-L{path} -lpython{version}'.format(
-                        path=python_link_root,
-                        version=python_link_version),
-
                     '-DBUILD_WITH_STANDALONE_TOOLCHAIN=ON',
-                    # Force to build as shared libraries the cv2's dependant
-                    # libs or we will not be able to link with our python
                     '-DBUILD_SHARED_LIBS=ON',
                     '-DBUILD_STATIC_LIBS=OFF',
                     '-Dprotobuf_BUILD_PROTOC_BINARIES=OFF',
