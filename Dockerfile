@@ -308,7 +308,7 @@ RUN dpkg --add-architecture i386 \
 
 # specific recipes dependencies (e.g. libffi requires autoreconf binary)
 RUN ${RETRY} apt -y install -qq --no-install-recommends \
-        libffi-dev autoconf automake cmake gettext libltdl-dev libtool pkg-config zlib1g-dev libc-ares-dev libssl1.0-dev \
+        libffi-dev autoconf automake cmake gettext libltdl-dev libtool pkg-config \
     && apt -y autoremove \
     && apt -y clean
 
