@@ -123,8 +123,12 @@ class GRPCRecipe(NDKRecipe):
                     _env=env)
             shprint(sh.make, '-j' + str(cpu_count()))
             # Copy third party shared libs that we need in our final apk
-            sh.cp('-a', sh.glob('./lib/{}/lib*.a'.format(arch.arch)),
-                  self.ctx.get_libs_dir(arch.arch))
+            #sh.cp('-a', sh.glob('./lib/{}/lib*.a'.format(arch.arch)),
+            #      self.ctx.get_libs_dir(arch.arch))
+
+             # copy static libs to libs collection
+            for lib in sh.glob(join(build_dir, '*.a')):
+                shprint(sh.cp, '-L', lib, self.ctx.libs_dir)
 
 
 recipe = GRPCRecipe()
