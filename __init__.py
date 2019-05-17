@@ -15,6 +15,14 @@ class GRPCRecipe(NDKRecipe):
     url = None
     port_git = 'https://github.com/grpc/grpc.git'
     generated_libraries = [
+        'libgrpc++_cronet.so',
+        'libgrpc_csharp_ext.so',
+        'libgrpc++_unsecure.so',
+        'libgrpc_plugin_support.so',
+        'libgrpc++.so',
+        'libgrpc_cronet.so',
+        'libgrpc_unsecure.so',
+        'libgrpc.so',
         'libaddress_sorting.a',
         'libbenchmark.a',
         'libbenchmark_main.a',
@@ -128,6 +136,9 @@ class GRPCRecipe(NDKRecipe):
 
              # copy static libs to libs collection
             for lib in sh.glob(join(build_dir, '*.a')):
+                shprint(sh.cp, '-L', lib, self.ctx.libs_dir)
+
+            for lib in sh.glob(join(build_dir, '*.so')):
                 shprint(sh.cp, '-L', lib, self.ctx.libs_dir)
 
 
