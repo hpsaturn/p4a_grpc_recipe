@@ -280,7 +280,10 @@ RUN mkdir -p "${BUILD_DIR}" && cd "${BUILD_DIR}" \
   && cmake --build . --target install/strip -- -j"${N_JOBS}" \
   && rm -rf "${BUILD_DIR}" \
   # Wipe out to prevent influencing the grpc build
-  && rm -rf ${PROJECT_DIR}/grpc/third_party/protobuf
+  && rm -rf ${PROJECT_DIR}/grpc/third_party/protobuf \
+  # bug: link symbolics missed for GRPC compiling
+  && ln -sf /opt/android/android-ndk/platforms/android-21/arch-arm/usr/lib/libc.so /opt/android/android-ndk/platforms/android-21/arch-arm/usr/lib/libnsl.so \
+  && ln -sf /opt/android/android-ndk/platforms/android-21/arch-arm/usr/lib/libc.so /opt/android/android-ndk/platforms/android-21/arch-arm/usr/lib/librt.so
 
 # Python and user packages
 
