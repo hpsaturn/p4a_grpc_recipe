@@ -2,6 +2,8 @@
 
 Testing migration of GRPC to Python for Android (p4a) recipe
 
+**WARNING** in development
+
 # Provisional installation
 
 In your Python P4A project:
