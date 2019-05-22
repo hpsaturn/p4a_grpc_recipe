@@ -323,7 +323,7 @@ RUN usermod -append --groups sudo ${USER}
 RUN echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 
-RUN pip3 install --upgrade cython==0.28.6
+RUN pip3 install --upgrade cython==0.28.3
 
 WORKDIR ${WORK_DIR}
 COPY --chown=user:user . ${WORK_DIR}
